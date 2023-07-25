@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Heart, Plus, X } from 'react-feather';
+import { Heart, Plus, Shuffle, X } from 'react-feather';
 import { Link } from 'react-router-dom';
-import { Recipe } from '../../@types/recipe';
+import { MealAdd, Recipe } from '../../@types/recipe';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { changeStateModalAnimation } from '../../store/reducers/favoris';
 import {
@@ -84,9 +84,32 @@ function RecipeCard({ recipe }: CardProps) {
       setRecipeFavori(false);
     }
   }
+
+  // Function to handle delete the recipe to schedule
   function handleDeleteMeal(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     dispatch(deleteMeal(recipe.id));
+  }
+
+  // Function to handle shuffle when there are No Recipe
+  async function handleShuffleMeal(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+
+    const response = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/random.php`
+    );
+    const data = await response.json();
+
+    const meal = data.meals[0];
+
+    const uniqueMeal: MealAdd = {
+      idDbMeal: meal.idMeal,
+      name: meal.strMeal,
+      image: meal.strMealThumb,
+      position: recipe.position,
+    };
+
+    dispatch(addSchedule({ meals: uniqueMeal, week: currentWeek }));
   }
 
   // useEffect to check if the recipe is in favorites and update recipeFavori
@@ -192,14 +215,31 @@ function RecipeCard({ recipe }: CardProps) {
             <Plus size={20} />
           </button>
         </div>
-        {recipe.id !== 1 && (
+
+        {/* Is there a recipe on this card? If yes, we display the delete function; otherwise, we display the shuffle function. */}
+        {recipe.id !== 1 ? (
           <div
-            className={`card-actions justify-end bg-t ${
+            className={`card-actions justify-end  ${
               stateHome ? 'hidden' : ''
-            }
-          ${stateSchedule ? '' : 'hidden'}
-          ${displayScheduleModal ? 'hidden' : ''}`}
+            } ${stateSchedule ? '' : 'hidden'}     ${
+              displayScheduleModal ? 'hidden' : ''
+            }`}
           >
+            {/* ----------- Function DELETE ----------- */}
+            <button
+              type="button"
+              className="hover:text-secondaryff transition-all bg-gray-700/50 rounded-full p-2"
+              onClick={(event) => {
+                event.preventDefault();
+                handleAddFavori(event);
+              }}
+            >
+              {recipeFavori ? (
+                <Heart size={20} fill="red" />
+              ) : (
+                <Heart size={20} />
+              )}
+            </button>
             <button
               type="button"
               className="hover:text-secondaryff transition-all bg-gray-700/50 rounded-full p-2"
@@ -209,6 +249,26 @@ function RecipeCard({ recipe }: CardProps) {
               }}
             >
               <X className="h-2 w-2 sm:h-4 sm:w-4 text-[rgb(255,0,0)]" />
+            </button>
+          </div>
+        ) : (
+          <div
+            className={`card-actions justify-end  ${
+              stateHome ? 'hidden' : ''
+            } ${stateSchedule ? '' : 'hidden'}     ${
+              displayScheduleModal ? 'hidden' : ''
+            }`}
+          >
+            {/* ----------- Function SHUFFLE ----------- */}
+            <button
+              type="button"
+              className="hover:text-secondaryff transition-all bg-gray-700/50 rounded-full p-2"
+              onClick={(event) => {
+                event.preventDefault();
+                handleShuffleMeal(event);
+              }}
+            >
+              <Shuffle className="h-2 w-2 sm:h-4 sm:w-4 text-[rgb(255,0,0)]" />
             </button>
           </div>
         )}
