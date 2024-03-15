@@ -15,7 +15,7 @@ interface AddScheduleButtonProps {
 function AddScheduleButton({ recipe }: AddScheduleButtonProps) {
   const isLogged = useAppSelector((state) => state.settings.isLogged);
   const clickAddFavori = useAppSelector(
-    (state) => state.schedule.clickAddSchedule
+    (state) => state.settings.clickAddSchedule
   );
 
   const dispatch = useAppDispatch();
