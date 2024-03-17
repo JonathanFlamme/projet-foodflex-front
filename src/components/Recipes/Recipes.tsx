@@ -10,7 +10,6 @@ import {
   fetchSearchRecipe,
 } from '../../store/reducers/recipes';
 import CategoriesListBox from './Categories/CategoriesListBox';
-import Upload from './upload';
 
 function Recipes() {
   const [search, setSearch] = useState('');
@@ -44,8 +43,6 @@ function Recipes() {
         modalIsOpen ? 'sm:blur-[3px] sm:pointer-events-none' : ''
       }`}
     >
-      <Upload />
-
       <h1 className="text-titleff text-2xl sm:text-4xl font-bold md:mb-8 m-6 text-center">
         Find exactly what you need !
       </h1>
